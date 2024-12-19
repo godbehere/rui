@@ -2,20 +2,35 @@ import logo from './logo.svg';
 import './App.css';
 import { useState, useEffect } from 'react';
 
-function Recipe() {
-  const [ recipes, setRecipes ] = useState([]);
+function Recipe({recipeId}) {
+  const [ recipe, setRecipe ] = useState(null);
   useEffect(() => {
-    fetch('http://localhost:8080/recipes')
+    fetch(`http://localhost:8080/recipe?recipeId=${recipeId}`)
       .then((res) => {
         return res.json();
       })
       .then((data) => {
-        setRecipes(data);
+        setRecipe(data);
       });
   }, []);
 
+  if(!recipe) {
+    return <div>Loading...</div>
+  }
+
+  // const ingredientsList = recipe.ingredients.map(item => <li>{item.amount} {item.units}  {item.ingredient.label}</li>);
+
   return (
-    <div>{recipes}</div>
+    <div>
+      <h2>{recipe.label}</h2>
+      <h3>Instructions</h3>
+      <div>{recipe.instructions.sort((a, b) => a.stepNumber - b.stepNumber).map(step => <p>{step.stepNumber}. {step.step}</p>)}</div>
+      <h3>Ingredients</h3>
+      <ul>{recipe.ingredients.map(item => <li>{item.amount} {item.units}  {item.ingredient.label}</li>)}</ul>
+      {/* <ul>{JSON.stringify(recipe.ingredients)}</ul> */}
+      {/* <div>{recipe.ingredients}</div> */}
+      {/* <ul>{ingredientsList}</ul> */}
+    </div>
   );
 }
 
